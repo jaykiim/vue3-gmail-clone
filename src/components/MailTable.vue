@@ -21,14 +21,20 @@
       </tr>
     </tbody>
   </table>
-  <MailView v-if="openedEmail" :email="openedEmail" />
+
+  <Modal v-if="openedEmail" @closeModal="openedEmail = null">
+    <MailView :email="openedEmail" />
+  </Modal>
 </template>
 
 <script>
+import { ref } from "vue";
 import { format } from "date-fns";
 import axios from "axios";
+
 import MailView from "@/components/MailView.vue";
-import { ref } from "vue";
+import Modal from "@/components/Modal.vue";
+
 export default {
   async setup() {
     let { data: emails } = await axios.get("http://localhost:3000/emails");
@@ -40,6 +46,7 @@ export default {
   },
   components: {
     MailView,
+    Modal,
   },
   computed: {
     sortedEmails() {
