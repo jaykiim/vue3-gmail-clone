@@ -22,28 +22,30 @@
 <script>
 import { format } from "date-fns";
 import marked from "marked";
-import axios from "axios";
 import useKeydown from "../composables/use-keydown";
 
 export default {
-  setup(props) {
-    const email = props.email;
-
-    const toggleRead = () => {
-      email.read = !email.read;
-      axios.put(`http://localhost:3000/emails/${email.id}`, email);
+  setup(props, { emit }) {
+    const toggleRead = () => emit("changeEmail", { toggleRead: true, save: true });
+    const toggleArchive = () =>
+      emit("changeEmail", { toggleArchive: true, save: true, closeModal: true });
+    const goNewer = () => emit("changeEmail", { changeIndex: -1 });
+    const goOlder = () => emit("changeEmail", { changeIndex: 1 });
+    const goNewerAndArchive = () => {
+      emit("changeEmail", { changeIndex: -1, toggleArchive: true, save: true });
+    };
+    const goOlderAndArchive = () => {
+      emit("changeEmail", { changeIndex: 1, toggleArchive: true, save: true });
     };
 
-    const toggleArchive = () => {
-      email.archived = !email.archived;
-      axios.put(`http://localhost:3000/emails/${email.id}`, email);
-    };
-
-    const goNewer = () => {};
-
-    const goOlder = () => {};
-
-    useKeydown([{ key: "r", fn: () => toggleRead() }]);
+    useKeydown([
+      { key: "r", fn: () => toggleRead() },
+      { key: "e", fn: () => toggleArchive() },
+      { key: "k", fn: () => goNewer() },
+      { key: "j", fn: () => goOlder() },
+      { key: "[", fn: () => goNewerAndArchive() },
+      { key: "]", fn: () => goOlderAndArchive() },
+    ]);
 
     return {
       format,
